@@ -10,6 +10,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY bot/ bot/
 COPY config/ config/
+COPY admin/ admin/
 COPY main.py .
 
 CMD ["python", "main.py"]

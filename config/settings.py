@@ -3,7 +3,6 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-
 BOT_TOKEN = os.getenv("BOT_TOKEN", "")
 ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
 
@@ -17,6 +16,10 @@ DATABASE_URL = (
     f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}"
     f"@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
 )
+
+ADMIN_LOGIN = os.getenv("ADMIN_LOGIN", "admin")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "")
+ADMIN_SECRET_KEY = os.getenv("ADMIN_SECRET_KEY", "change-me-secret")
 
 if not BOT_TOKEN:
     raise RuntimeError("BOT_TOKEN is not set")
