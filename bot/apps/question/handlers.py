@@ -88,6 +88,14 @@ async def admin_reply(message: Message) -> None:
         await message.answer("Не удалось доставить сообщение ученику.")
 
 
+@router.message(F.chat.id == ADMIN_ID, F.text == core_keyboards.MENU_BUTTON_TEXT)
+async def admin_menu(message: Message) -> None:
+    await message.answer(
+        "Меню администратора",
+        reply_markup=core_keyboards.menu_reply_keyboard,
+    )
+
+
 @router.message(F.chat.id == ADMIN_ID)
 async def admin_chat_noise(message: Message) -> None:
     """Non-reply messages in the admin chat are ignored."""
@@ -100,3 +108,7 @@ async def forward_to_admin(message: Message) -> None:
     if message.chat.type != "private":
         return
     await _copy_to_admin(message)
+    await message.answer(
+        "✅ Получено! Алия и кураторы ответят вам в течение дня.",
+        reply_markup=core_keyboards.start_inline_keyboard(message.from_user.id == ADMIN_ID),
+    )

@@ -25,6 +25,15 @@ async def _greet(message: Message, session: AsyncSession, telegram_id: int) -> N
 @router.message(CommandStart())
 async def start(message: Message, session: AsyncSession) -> None:
     await _greet(message, session, message.from_user.id)
+    await message.answer(
+        "Кнопка «Меню» внизу экрана всегда вернёт вас сюда 👇",
+        reply_markup=core_keyboards.menu_reply_keyboard,
+    )
+
+
+@router.message(F.text == core_keyboards.MENU_BUTTON_TEXT)
+async def menu_button(message: Message, session: AsyncSession) -> None:
+    await _greet(message, session, message.from_user.id)
 
 
 @router.callback_query(F.data == "main")

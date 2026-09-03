@@ -1,6 +1,15 @@
-from aiogram.types import InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
 
 from config.settings import ADMIN_ID
+
+MENU_BUTTON_TEXT = "🏠 Меню"
+
+menu_reply_keyboard = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton(text=MENU_BUTTON_TEXT)]],
+    resize_keyboard=True,
+    is_persistent=True,
+    input_field_placeholder="Напишите вопрос или отправьте домашку 📎",
+)
 
 
 def start_inline_keyboard(is_admin: bool = False) -> InlineKeyboardMarkup:
