@@ -5,10 +5,7 @@ import sys
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 
-from bot.apps.admin.handlers import router as admin_router
 from bot.apps.deadlines.handlers import router as deadlines_router
-from bot.apps.homework.handlers import router as homework_router
-from bot.apps.materials.handlers import router as materials_router
 from bot.apps.question.handlers import router as question_router
 from bot.apps.start.handlers import router as start_router
 from bot.database.session import Base, engine
@@ -39,11 +36,8 @@ async def main() -> None:
 
     for router in (
         start_router,
-        admin_router,
         question_router,
         deadlines_router,
-        homework_router,
-        materials_router,
     ):
         dp.include_router(router)
 
