@@ -6,6 +6,7 @@ Run by the `admin` docker-compose service:
 
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
+from itsdangerous import URLSafeSerializer, BadSignature
 from sqladmin import Admin
 from sqladmin.authentication import AuthenticationBackend
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -41,8 +42,17 @@ class StatsAuthMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: StarletteRequest, call_next):
         if request.url.path.rstrip("/") == "/admin/stats":
-            auth = AdminAuth(secret_key=settings.ADMIN_SECRET_KEY)
-            if not await auth.authenticate(request):
+            ok = False
+            cookie = request.cookies.get("session")
+            if cookie:
+                try:
+                    data = URLSafeSerializer(
+                        settings.ADMIN_SECRET_KEY, salt="starlette.sessions:"
+                    ).loads(cookie)
+                    ok = data.get("token") == settings.ADMIN_SECRET_KEY[:16]
+                except BadSignature:
+                    ok = False
+            if not ok:
                 return RedirectResponse(url="/admin/login", status_code=302)
         return await call_next(request)
 
