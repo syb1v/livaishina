@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# Environment & secrets
+.env
+*.env
+
+# Database
+*.sqlite3
+*.sqlite3-journal
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+
+# Project
+media/
+opencode.json
