@@ -15,6 +15,7 @@ menu_reply_keyboard = ReplyKeyboardMarkup(
 def start_inline_keyboard(is_admin: bool = False) -> InlineKeyboardMarkup:
     rows = [
         [("⏰ Дедлайны", "deadlines")],
+        [("📅 Расписание", "schedule")],
         [("❓ Задать вопрос / Отправить домашку", "question")],
     ]
     return InlineKeyboardMarkup(

@@ -1,0 +1,97 @@
+{% extends "sqladmin/layout.html" %}
+{% block content_header %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Статистика</h1>
+</div>
+{% endblock %}
+
+{% block content %}
+<style>
+    .stat-card { border: 1px solid #e3e6f0; border-radius: .5rem; padding: 1rem 1.25rem; background: #fff; }
+    .stat-card .num { font-size: 1.75rem; font-weight: 700; }
+    .stat-card .lbl { color: #6c757d; font-size: .85rem; }
+    .bar { font-family: monospace; font-size: 12px; color: #4e73df; white-space: nowrap; }
+    table.table td, table.table th { vertical-align: middle; }
+</style>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="num">{{ users_total }}</div>
+            <div class="lbl">Учеников всего</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="num">{{ submissions_total }}</div>
+            <div class="lbl">Работ/вопросов за 14 дней</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="num">{{ log_rows }}</div>
+            <div class="lbl">Всего отправок в логе</div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3"><h6 class="m-0 font-weight-bold">Активность по дням (14 дней)</h6></div>
+    <div class="card-body">
+        {% if bars %}
+        <table class="table table-borderless mb-0">
+            {% for day, count, bar in bars %}
+            <tr>
+                <td style="width:90px; color:#6c757d;">{{ day }}</td>
+                <td class="bar">{{ bar }}</td>
+                <td style="width:40px; text-align:right;">{{ count }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p class="text-muted mb-0">Пока нет отправок.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow h-100">
+            <div class="card-header py-3"><h6 class="m-0 font-weight-bold">Типы контента (последние отправки)</h6></div>
+            <div class="card-body">
+                {% if by_type %}
+                <table class="table mb-0">
+                    <tr><th>Тип</th><th style="width:80px">Шт.</th></tr>
+                    {% for t, c in by_type %}
+                    <tr><td>{{ t }}</td><td>{{ c }}</td></tr>
+                    {% endfor %}
+                </table>
+                {% else %}
+                <p class="text-muted mb-0">Нет данных.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow h-100">
+            <div class="card-header py-3"><h6 class="m-0 font-weight-bold">Последние отправки</h6></div>
+            <div class="card-body">
+                {% if recent %}
+                <table class="table mb-0">
+                    <tr><th>ID ученика</th><th>Тип</th><th>Когда</th></tr>
+                    {% for m in recent %}
+                    <tr>
+                        <td><a href="https://t.me/{{ m.telegram_id }}" target="_blank">{{ m.telegram_id }}</a></td>
+                        <td>{{ m.content_type }}</td>
+                        <td>{{ m.created_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% else %}
+                <p class="text-muted mb-0">Пока никто ничего не отправлял.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

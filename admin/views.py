@@ -1,6 +1,6 @@
 from sqladmin import ModelView
 
-from bot.database.models import Deadline, User
+from bot.database.models import Deadline, ScheduleItem, User
 
 
 class UserAdmin(ModelView, model=User):
@@ -42,4 +42,26 @@ class DeadlineAdmin(ModelView, model=Deadline):
     can_edit = True
     can_delete = True
     can_export = True
-    name_plural = "Дедлайны"
+
+
+class ScheduleAdmin(ModelView, model=ScheduleItem):
+    name = "Занятие"
+    name_plural = "Расписание"
+    icon = "fa-solid fa-calendar-days"
+
+    column_list = [ScheduleItem.position, ScheduleItem.label]
+    column_labels = {
+        ScheduleItem.position: "Порядок",
+        ScheduleItem.label: "Занятие",
+    }
+    column_sortable_list = [ScheduleItem.position]
+    form_columns = ["label", "position"]
+    form_args = {
+        "label": {"label": "Например: Вт 18:00 — живой разбор"},
+        "position": {"label": "Порядок в списке"},
+    }
+
+    can_create = True
+    can_edit = True
+    can_delete = True
+    can_export = True

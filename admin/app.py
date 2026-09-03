@@ -4,13 +4,15 @@ Run by the `admin` docker-compose service:
     uvicorn admin.app:app --host 0.0.0.0 --port 8000
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import RedirectResponse
 from sqladmin import Admin
 from sqladmin.authentication import AuthenticationBackend
-from starlette.requests import Request
-from starlette.responses import RedirectResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request as StarletteRequest
 
-from admin.views import DeadlineAdmin, UserAdmin
+from admin.stats import router as stats_router
+from admin.views import DeadlineAdmin, ScheduleAdmin, UserAdmin
 from bot.database.session import SessionMaker, engine
 from config import settings
 
@@ -34,6 +36,17 @@ class AdminAuth(AuthenticationBackend):
         return bool(token) and token == settings.ADMIN_SECRET_KEY[:16]
 
 
+class StatsAuthMiddleware(BaseHTTPMiddleware):
+    """Protect custom /admin/stats page with the same session auth as sqladmin."""
+
+    async def dispatch(self, request: StarletteRequest, call_next):
+        if request.url.path.rstrip("/") == "/admin/stats":
+            auth = AdminAuth(secret_key=settings.ADMIN_SECRET_KEY)
+            if not await auth.authenticate(request):
+                return RedirectResponse(url="/admin/login", status_code=302)
+        return await call_next(request)
+
+
 def create_app() -> FastAPI:
     app = FastAPI(title="Livaishina Admin", docs_url=None, redoc_url=None)
 
@@ -47,6 +60,11 @@ def create_app() -> FastAPI:
     )
     admin.add_view(UserAdmin)
     admin.add_view(DeadlineAdmin)
+    admin.add_view(ScheduleAdmin)
+    app.state.admin = admin
+
+    app.add_middleware(StatsAuthMiddleware)
+    app.include_router(stats_router)
 
     @app.get("/", include_in_schema=False)
     async def root() -> RedirectResponse:

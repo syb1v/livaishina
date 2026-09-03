@@ -7,6 +7,7 @@ from aiogram.client.default import DefaultBotProperties
 
 from bot.apps.deadlines.handlers import router as deadlines_router
 from bot.apps.question.handlers import router as question_router
+from bot.apps.schedule.handlers import router as schedule_router
 from bot.apps.start.handlers import router as start_router
 from bot.database.session import Base, engine
 from bot.middlewares.db import DbSessionMiddleware
@@ -38,6 +39,7 @@ async def main() -> None:
         start_router,
         question_router,
         deadlines_router,
+        schedule_router,
     ):
         dp.include_router(router)
 

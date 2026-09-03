@@ -17,6 +17,7 @@ from aiogram.types import CallbackQuery, Message
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot.core import keyboards as core_keyboards
+from bot.database.repository import MessageLogRepository
 from config.settings import ADMIN_ID
 
 router = Router()
@@ -40,7 +41,7 @@ def _sender_name(message: Message) -> str:
     return name
 
 
-async def _copy_to_admin(message: Message) -> None:
+async def _copy_to_admin(message: Message, session: AsyncSession) -> None:
     header = HEADER_TEMPLATE.format(name=_sender_name(message), user_id=message.from_user.id)
     try:
         await message.send_copy(ADMIN_ID, caption=header)
@@ -50,6 +51,13 @@ async def _copy_to_admin(message: Message) -> None:
         await message.send_copy(ADMIN_ID)
     except Exception:
         logger.exception("failed to copy message to admin")
+        return
+    try:
+        await MessageLogRepository(session).log(
+            message.from_user.id, message.content_type
+        )
+    except Exception:
+        logger.exception("failed to log submission")
 
 
 @router.message(Command("question"))
@@ -103,11 +111,11 @@ async def admin_chat_noise(message: Message) -> None:
 
 
 @router.message()
-async def forward_to_admin(message: Message) -> None:
+async def forward_to_admin(message: Message, session: AsyncSession) -> None:
     """Catch-all: every private message from students goes to the admin chat."""
     if message.chat.type != "private":
         return
-    await _copy_to_admin(message)
+    await _copy_to_admin(message, session)
     await message.answer(
         "✅ Получено! Алия и кураторы ответят вам в течение дня.",
         reply_markup=core_keyboards.start_inline_keyboard(message.from_user.id == ADMIN_ID),
