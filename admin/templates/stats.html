@@ -7,8 +7,8 @@
 
 {% block content %}
 <style>
-    .stat-card { border: 1px solid #e3e6f0; border-radius: .5rem; padding: 1rem 1.25rem; background: #fff; }
-    .stat-card .num { font-size: 1.75rem; font-weight: 700; }
+    .stat-card { border: 1px solid #e3e6f0; border-radius: .5rem; padding: 1rem 1.25rem; background: #fff; height: 100%; }
+    .stat-card .num { font-size: 1.6rem; font-weight: 700; }
     .stat-card .lbl { color: #6c757d; font-size: .85rem; }
     .bar { font-family: monospace; font-size: 12px; color: #4e73df; white-space: nowrap; }
     table.table td, table.table th { vertical-align: middle; }
@@ -29,8 +29,14 @@
     </div>
     <div class="col-md-3">
         <div class="stat-card">
-            <div class="num">{{ log_rows }}</div>
-            <div class="lbl">Всего отправок в логе</div>
+            <div class="num">{{ next_deadline }}</div>
+            <div class="lbl">Ближайший дедлайн</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="num">{{ deadlines_count }} / {{ schedule_count }}</div>
+            <div class="lbl">Дедлайнов / пунктов расписания</div>
         </div>
     </div>
 </div>
@@ -38,12 +44,12 @@
 <div class="card shadow mb-4">
     <div class="card-header py-3"><h6 class="m-0 font-weight-bold">Активность по дням (14 дней)</h6></div>
     <div class="card-body">
-        {% if bars %}
+        {% if submissions_total %}
         <table class="table table-borderless mb-0">
             {% for day, count, bar in bars %}
             <tr>
-                <td style="width:90px; color:#6c757d;">{{ day }}</td>
-                <td class="bar">{{ bar }}</td>
+                <td style="width:80px; color:#6c757d;">{{ day }}</td>
+                <td class="bar">{{ bar or "—" }}</td>
                 <td style="width:40px; text-align:right;">{{ count }}</td>
             </tr>
             {% endfor %}
@@ -57,7 +63,7 @@
 <div class="row">
     <div class="col-lg-6 mb-4">
         <div class="card shadow h-100">
-            <div class="card-header py-3"><h6 class="m-0 font-weight-bold">Типы контента (последние отправки)</h6></div>
+            <div class="card-header py-3"><h6 class="m-0 font-weight-bold">Типы контента</h6></div>
             <div class="card-body">
                 {% if by_type %}
                 <table class="table mb-0">

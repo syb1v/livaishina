@@ -23,12 +23,6 @@ from config.settings import ADMIN_ID
 router = Router()
 logger = logging.getLogger(__name__)
 
-QUESTION_INFO_TEXT = (
-    "Напишите ваш вопрос или отправьте домашку (фото, файл, видео) прямо в чат — "
-    "я передам её Алии и кураторам. Ответ придёт сюда же.\n\n"
-    "Отвечаем в течение дня. Нажимать ничего больше не нужно."
-)
-
 HEADER_TEMPLATE = "✉️ {name} (id={user_id}) переслал(а) сообщение:\n\n"
 
 
@@ -62,7 +56,10 @@ async def _copy_to_admin(message: Message, session: AsyncSession) -> None:
 
 @router.message(Command("question"))
 async def question_command(message: Message) -> None:
-    await message.answer(QUESTION_INFO_TEXT, reply_markup=core_keyboards.main_inline_keyboard)
+    await message.answer(
+        "Жду ваш вопрос или домашку 👇",
+        reply_markup=core_keyboards.main_inline_keyboard,
+    )
 
 
 @router.callback_query(F.data == "question")
@@ -72,7 +69,10 @@ async def question_button(call: CallbackQuery) -> None:
         await call.message.delete()
     except Exception:
         pass
-    await call.message.answer(QUESTION_INFO_TEXT, reply_markup=core_keyboards.main_inline_keyboard)
+    await call.message.answer(
+        "Жду ваш вопрос или домашку 👇",
+        reply_markup=core_keyboards.main_inline_keyboard,
+    )
 
 
 @router.message(F.from_user.id == ADMIN_ID, F.reply_to_message)
